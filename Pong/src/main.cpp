@@ -212,6 +212,13 @@ class Game{
 	void update(float dt){
 		switch (state) {
 			case GameState::START_SCREEN:
+				if(IsKeyPressed(KEY_SPACE)){
+					state = GameState::PLAYING;
+					paddle_0.reset();
+					paddle_1.reset();
+					ball.reset();
+					ball.launch();
+				}
 				break;
 			case GameState::PLAYING:
 				break;
@@ -221,12 +228,6 @@ class Game{
 				break;
 		}
 
-		if(ball.is_still() && IsKeyPressed(KEY_SPACE)){
-			paddle_0.reset();
-			paddle_1.reset();
-			ball.reset();
-			ball.launch();
-		}
 		paddle_0.update(dt);
 		paddle_1.update(dt);
 		ball.update(dt);
