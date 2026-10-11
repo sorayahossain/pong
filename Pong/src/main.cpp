@@ -267,6 +267,17 @@ class Game{
 	}
 
 	void render() const{
+		switch (state) {
+			case GameState::START_SCREEN:
+				break;
+			case GameState::PLAYING:
+				break;
+			case GameState::ROUND_OVER:
+				break;
+			case GameState::GAME_OVER:
+				break;
+		}
+
 		BeginDrawing();
 		ClearBackground(BACKGROUND_COLOR);
 		paddle_0.render();
