@@ -250,6 +250,9 @@ class Game{
 				}
 				break;
 			case GameState::ROUND_OVER:
+				ball.reset();
+				ball.launch();
+				state = GameState::PLAYING;
 				break;
 			case GameState::GAME_OVER:
 				break;
