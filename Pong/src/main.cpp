@@ -255,9 +255,15 @@ class Game{
 				state = GameState::PLAYING;
 				break;
 			case GameState::GAME_OVER:
+				if(IsKeyPressed(KEY_SPACE)){
+					state = GameState::PLAYING;
+					paddle_0.reset();
+					paddle_1.reset();
+					ball.reset();
+					ball.launch();
+				}
 				break;
 		}
-
 	}
 
 	void render() const{
