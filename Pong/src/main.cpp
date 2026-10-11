@@ -74,6 +74,10 @@ struct Ball{
 		return Vector2Length(velocity) < 0.01f;
 	}
 
+	void stop(){
+		velocity = {0.0f, 0.0f};
+	}
+
 	void launch(){
 		velocity = LAUNCH_VELOCITY;
 	}
@@ -214,6 +218,9 @@ class Game{
 					break;
 			}
 		}
+		if(!ball.is_still() && (paddle_0.get_lives() == 0 || paddle_1.get_lives() == 0)){
+			ball.stop();
+		}
 		ball.do_collision_with(paddle_0.get_rectangle());
 		ball.do_collision_with(paddle_1.get_rectangle());
 	}
@@ -225,7 +232,13 @@ class Game{
 		paddle_1.render();
 		ball.render();
 		if(ball.is_still()){
-			DrawText("Press SPACE to serve!", (int)MARGIN+TEXT_SIZE, WINDOW_HEIGHT - TEXT_SIZE, TEXT_SIZE, TEXT_COLOR);
+			if(paddle_0.get_lives() == 0) {
+				DrawText("Player 1 WIN!", (int)MARGIN+TEXT_SIZE, WINDOW_HEIGHT - TEXT_SIZE, TEXT_SIZE, TEXT_COLOR);
+			} else if (paddle_1.get_lives() == 0){
+				DrawText("Player 0 WIN!", (int)MARGIN+TEXT_SIZE, WINDOW_HEIGHT - TEXT_SIZE, TEXT_SIZE, TEXT_COLOR);
+			} else {
+				DrawText("Press SPACE to serve!", (int)MARGIN+TEXT_SIZE, WINDOW_HEIGHT - TEXT_SIZE, TEXT_SIZE, TEXT_COLOR);
+			}
 		}
 		EndDrawing();
 	}
