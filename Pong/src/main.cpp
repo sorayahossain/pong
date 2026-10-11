@@ -127,14 +127,8 @@ class Paddle{
 	uint score = 0;
 
 public:
-	Paddle(Side position){
-		side = position;
-		if(side == Side::LEFT){
-			reset_position(MARGIN, (WINDOW_HEIGHT - PADDLE_HEIGHT) / 2.0f);
-		}
-		if(side == Side::RIGHT){
-			reset_position(WINDOW_WIDTH - PADDLE_WIDTH - MARGIN, (WINDOW_HEIGHT - PADDLE_HEIGHT) / 2.0f);
-		}
+	Paddle(Side position): side{position}{
+		reset();
 	}
 
 	void update(float dt){
@@ -176,6 +170,13 @@ public:
 	void reset(){
 		lives = 5;
 		score = 0;
+
+		if(side == Side::LEFT){
+			reset_position(MARGIN, (WINDOW_HEIGHT - PADDLE_HEIGHT) / 2.0f);
+		}
+		if(side == Side::RIGHT){
+			reset_position(WINDOW_WIDTH - PADDLE_WIDTH - MARGIN, (WINDOW_HEIGHT - PADDLE_HEIGHT) / 2.0f);
+		}
 	}
 
 	Rectangle get_rectangle() const{
