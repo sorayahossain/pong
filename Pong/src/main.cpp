@@ -22,17 +22,6 @@ enum class Side{
 	LEFT, RIGHT, TOP, BOTTOM
 };
 
-constexpr std::string_view to_string(Side side) {
-    switch (side) {
-		case Side::LEFT:   return "LEFT";
-		case Side::RIGHT:  return "RIGHT";
-		case Side::TOP:    return "TOP";
-		case Side::BOTTOM: return "BOTTOM";
-    }
-
-    return "UNKNOWN";
-}
-
 enum class Axis{
 	X, Y
 };
@@ -110,6 +99,8 @@ class Paddle{
 	Rectangle rectangle{0.0f, 0.0f, PADDLE_WIDTH, PADDLE_HEIGHT};
 	Color color{RAYWHITE};
 	Side side{Side::LEFT};
+	uint lives = 5;
+	uint score = 0;
 
 public:
 	Paddle(Side position){
@@ -140,6 +131,24 @@ public:
 		DrawRectangleRec(rectangle, color);
 	}
 
+	uint get_score() const{
+		return score;
+	}
+
+	uint get_lives() const{
+		return lives;
+	}
+
+	void lose() {
+		if(lives > 0){
+			lives--;
+		}
+	}
+
+	void score_up() {
+		score++;
+	}
+
 	Rectangle get_rectangle() const{
 		return rectangle;
 	}
@@ -164,7 +173,18 @@ class Game{
 		ball.update(dt);
 		Side side;
 		if(check_bounds_for(ball, side)) {
-			std::println(stdout, "left at {}", to_string(side));
+			switch (side) {
+				case Side::LEFT:
+					paddle_0.lose();
+					paddle_1.score_up();
+					std::println("GOAL to paddle 1, score 0: {} lives 0: {}, score 1: {} lives 1: {}", paddle_0.get_score(), paddle_0.get_lives(), paddle_1.get_score(), paddle_1.get_lives());
+					break;
+				case Side::RIGHT:
+					paddle_0.score_up();
+					paddle_1.lose();
+					std::println("GOAL to paddle 0, score 0: {} lives 0: {}, score 1: {} lives 1: {}", paddle_0.get_score(), paddle_0.get_lives(), paddle_1.get_score(), paddle_1.get_lives());
+					break;
+			}
 		}
 		ball.do_collision_with(paddle_0.get_rectangle());
 		ball.do_collision_with(paddle_1.get_rectangle());
