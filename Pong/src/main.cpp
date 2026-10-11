@@ -278,6 +278,11 @@ class Game{
 				DrawText("Press SPACE to serve!", (int)MARGIN+TEXT_SIZE, WINDOW_HEIGHT - TEXT_SIZE, TEXT_SIZE, TEXT_COLOR);
 				break;
 			case GameState::PLAYING:
+				paddle_0.render();
+				paddle_1.render();
+				ball.render();
+				DrawText(("Player 0: (lives: " + std::to_string(paddle_0.get_lives()) + "; Score: " + std::to_string(paddle_0.get_score()) + ")").c_str(), (int)MARGIN+TEXT_SIZE, TEXT_SIZE, TEXT_SIZE/2, TEXT_COLOR);
+				DrawText(("Player 1: (lives: " + std::to_string(paddle_1.get_lives()) + "; Score: " + std::to_string(paddle_1.get_score()) + ")").c_str(), (int)MARGIN+TEXT_SIZE, TEXT_SIZE*2, TEXT_SIZE/2, TEXT_COLOR);
 				break;
 			case GameState::ROUND_OVER:
 				break;
