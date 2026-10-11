@@ -73,24 +73,52 @@ struct Ball{
 	bool is_still() const{
 		return Vector2Length(velocity) < 0.01f;
 	}
+
 	void launch(){
 		velocity = LAUNCH_VELOCITY;
+	}
+
+	void speed_up(Axis axis, float delta){
+		if(axis == Axis::X){
+			if(velocity.x > 1000.0f || velocity.x < -1000.0f){
+				return;
+			}
+
+			if(velocity.x > 0){
+				velocity.x += delta;
+			} else {
+				velocity.x -= delta;
+			}
+		} else {
+			if(velocity.y > 600.0f || velocity.y < -600.0f){
+				return;
+			}
+
+			if(velocity.y > 0){
+				velocity.y += delta;
+			} else {
+				velocity.y -= delta;
+			}
+		}
 	}
 
 	void do_collision_with(Rectangle r){
 		if(!CheckCollisionRecs(get_rectangle(), r)){
 			return;
 		}
+
 		Rectangle overlap = GetCollisionRec(get_rectangle(), r);
 		bool sidehit = overlap.width < overlap.height;
 		if(sidehit){
 			float dx = (velocity.x > 0.0f) ? -overlap.width : overlap.width;
 			bounce(Axis::X);
 			nudge(Axis::X, dx);
+			speed_up(Axis::X, 40.0f);
 		} else{
 			float dy = (velocity.y > 0.0f) ? -overlap.height : overlap.height;
 			nudge(Axis::Y, dy);
 			bounce(Axis::Y);
+			speed_up(Axis::Y, 40.0f);
 		}
 	}
 };
@@ -177,12 +205,12 @@ class Game{
 				case Side::LEFT:
 					paddle_0.lose();
 					paddle_1.score_up();
-					std::println("GOAL to paddle 1, score 0: {} lives 0: {}, score 1: {} lives 1: {}", paddle_0.get_score(), paddle_0.get_lives(), paddle_1.get_score(), paddle_1.get_lives());
+					std::println("GOAL to paddle 1, {}, {} score 0: {} lives 0: {}, score 1: {} lives 1: {}", ball.velocity.x, ball.velocity.y, paddle_0.get_score(), paddle_0.get_lives(), paddle_1.get_score(), paddle_1.get_lives());
 					break;
 				case Side::RIGHT:
 					paddle_0.score_up();
 					paddle_1.lose();
-					std::println("GOAL to paddle 0, score 0: {} lives 0: {}, score 1: {} lives 1: {}", paddle_0.get_score(), paddle_0.get_lives(), paddle_1.get_score(), paddle_1.get_lives());
+					std::println("GOAL to paddle 0, {}, {} score 0: {} lives 0: {}, score 1: {} lives 1: {}", ball.velocity.x, ball.velocity.y, paddle_0.get_score(), paddle_0.get_lives(), paddle_1.get_score(), paddle_1.get_lives());
 					break;
 			}
 		}
