@@ -196,12 +196,31 @@ public:
 	}
 };
 
+enum class GameState {
+	START_SCREEN,
+	PLAYING,
+	ROUND_OVER,
+	GAME_OVER
+};
+
 class Game{
 	Paddle paddle_0{Side::LEFT};
 	Paddle paddle_1{Side::RIGHT};
 	Ball ball;
+	GameState state = GameState::START_SCREEN;
 
 	void update(float dt){
+		switch (state) {
+			case GameState::START_SCREEN:
+				break;
+			case GameState::PLAYING:
+				break;
+			case GameState::ROUND_OVER:
+				break;
+			case GameState::GAME_OVER:
+				break;
+		}
+
 		if(ball.is_still() && IsKeyPressed(KEY_SPACE)){
 			paddle_0.reset();
 			paddle_1.reset();
