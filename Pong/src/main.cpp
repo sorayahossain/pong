@@ -70,10 +70,6 @@ struct Ball{
 		return Rectangle{position.x - radius, position.y - radius, radius * 2, radius * 2};
 	}
 
-	bool is_still() const{
-		return Vector2Length(velocity) < 0.01f;
-	}
-
 	void launch(){
 		velocity = LAUNCH_VELOCITY;
 	}
@@ -286,18 +282,12 @@ class Game{
 				DrawText(("Player 1: (lives: " + std::to_string(paddle_1.get_lives()) + "; Score: " + std::to_string(paddle_1.get_score()) + ")").c_str(), (int)MARGIN+TEXT_SIZE, TEXT_SIZE*2, TEXT_SIZE/2, TEXT_COLOR);
 				break;
 			case GameState::GAME_OVER:
+				if(paddle_0.get_lives() == 0) {
+					DrawText("Player 1 WIN! Press SPACE to restart...", (int)MARGIN+TEXT_SIZE, WINDOW_HEIGHT - TEXT_SIZE, TEXT_SIZE, TEXT_COLOR);
+				} else {
+					DrawText("Player 0 WIN! Press SPACE to restart...", (int)MARGIN+TEXT_SIZE, WINDOW_HEIGHT - TEXT_SIZE, TEXT_SIZE, TEXT_COLOR);
+				}
 				break;
-		}
-
-		paddle_0.render();
-		paddle_1.render();
-		ball.render();
-		if(ball.is_still()){
-			if(paddle_0.get_lives() == 0) {
-				DrawText("Player 1 WIN! Press SPACE to restart...", (int)MARGIN+TEXT_SIZE, WINDOW_HEIGHT - TEXT_SIZE, TEXT_SIZE, TEXT_COLOR);
-			} else if (paddle_1.get_lives() == 0){
-				DrawText("Player 0 WIN! Press SPACE to restart...", (int)MARGIN+TEXT_SIZE, WINDOW_HEIGHT - TEXT_SIZE, TEXT_SIZE, TEXT_COLOR);
-			}
 		}
 
 		EndDrawing();
