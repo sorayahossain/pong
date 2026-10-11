@@ -3,6 +3,9 @@
 #include <string>
 #include <algorithm>
 #include <vector>
+#include <print>
+
+using uint = uint32_t;
 
 constexpr auto TEXT_SIZE = 40;
 constexpr auto MARGIN = 27.0f;
@@ -159,7 +162,7 @@ class Game{
 	}
 
 	void check_bounds_for(Ball& b){
-		auto& pos = b.position; //create a local reference to the Ball::pos member, for convenience		
+		auto& pos = b.position; //create a local reference to the Ball::pos member, for convenience
 		const auto MAX_X = WINDOW_WIDTH - b.radius;
 		const auto MAX_Y = WINDOW_HEIGHT - b.radius;
 		if(pos.x < b.radius){
@@ -199,6 +202,7 @@ public:
 
 int main(){
 	Game game("Pong!", WINDOW_WIDTH, WINDOW_HEIGHT);
+	std::println("Game is running");
 	game.run();
 	return 0;
 }
