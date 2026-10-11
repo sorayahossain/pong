@@ -285,6 +285,11 @@ class Game{
 				DrawText(("Player 1: (lives: " + std::to_string(paddle_1.get_lives()) + "; Score: " + std::to_string(paddle_1.get_score()) + ")").c_str(), (int)MARGIN+TEXT_SIZE, TEXT_SIZE*2, TEXT_SIZE/2, TEXT_COLOR);
 				break;
 			case GameState::ROUND_OVER:
+				paddle_0.render();
+				paddle_1.render();
+				ball.render();
+				DrawText(("Player 0: (lives: " + std::to_string(paddle_0.get_lives()) + "; Score: " + std::to_string(paddle_0.get_score()) + ")").c_str(), (int)MARGIN+TEXT_SIZE, TEXT_SIZE, TEXT_SIZE/2, TEXT_COLOR);
+				DrawText(("Player 1: (lives: " + std::to_string(paddle_1.get_lives()) + "; Score: " + std::to_string(paddle_1.get_score()) + ")").c_str(), (int)MARGIN+TEXT_SIZE, TEXT_SIZE*2, TEXT_SIZE/2, TEXT_COLOR);
 				break;
 			case GameState::GAME_OVER:
 				break;
@@ -299,9 +304,6 @@ class Game{
 			} else if (paddle_1.get_lives() == 0){
 				DrawText("Player 0 WIN! Press SPACE to restart...", (int)MARGIN+TEXT_SIZE, WINDOW_HEIGHT - TEXT_SIZE, TEXT_SIZE, TEXT_COLOR);
 			}
-		} else {
-			DrawText(("Player 0: (Lives: " + std::to_string(paddle_0.get_lives()) + "; Score: " + std::to_string(paddle_0.get_score()) + ")").c_str(), (int)MARGIN+TEXT_SIZE, TEXT_SIZE, TEXT_SIZE/2, TEXT_COLOR);
-			DrawText(("Player 1: (Lives: " + std::to_string(paddle_1.get_lives()) + "; Score: " + std::to_string(paddle_1.get_score()) + ")").c_str(), (int)MARGIN+TEXT_SIZE, TEXT_SIZE*2, TEXT_SIZE/2, TEXT_COLOR);
 		}
 
 		EndDrawing();
