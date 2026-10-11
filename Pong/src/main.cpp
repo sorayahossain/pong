@@ -106,6 +106,9 @@ public:
 		if(side == Side::LEFT){
 			reset_position(MARGIN, (WINDOW_HEIGHT - PADDLE_HEIGHT) / 2.0f);
 		}
+		if(side == Side::RIGHT){
+			reset_position(WINDOW_WIDTH - PADDLE_WIDTH - MARGIN, (WINDOW_HEIGHT - PADDLE_HEIGHT) / 2.0f);
+		}
 	}
 
 	void update(float dt){
@@ -137,23 +140,27 @@ public:
 };
 
 class Game{
-	Paddle paddle{Side::LEFT};
+	Paddle paddle_0{Side::LEFT};
+	Paddle paddle_1{Side::RIGHT};
 	Ball ball;
 
 	void update(float dt){
 		if(ball.is_still() && IsKeyPressed(KEY_SPACE)){
 			ball.launch();
 		}
-		paddle.update(dt);
+		paddle_0.update(dt);
+		paddle_1.update(dt);
 		ball.update(dt);
 		check_bounds_for(ball);
-		ball.do_collision_with(paddle.get_rectangle());
+		ball.do_collision_with(paddle_0.get_rectangle());
+		ball.do_collision_with(paddle_1.get_rectangle());
 	}
 
 	void render() const{
 		BeginDrawing();
 		ClearBackground(BACKGROUND_COLOR);
-		paddle.render();
+		paddle_0.render();
+		paddle_1.render();
 		ball.render();
 		if(ball.is_still()){
 			DrawText("Press SPACE to serve!", (int)MARGIN+TEXT_SIZE, WINDOW_HEIGHT - TEXT_SIZE, TEXT_SIZE, TEXT_COLOR);
