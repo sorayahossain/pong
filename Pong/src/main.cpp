@@ -74,10 +74,6 @@ struct Ball{
 		return Vector2Length(velocity) < 0.01f;
 	}
 
-	void stop(){
-		velocity = {0.0f, 0.0f};
-	}
-
 	void launch(){
 		velocity = LAUNCH_VELOCITY;
 	}
@@ -221,6 +217,37 @@ class Game{
 				}
 				break;
 			case GameState::PLAYING:
+				paddle_0.update(dt);
+				paddle_1.update(dt);
+
+				ball.update(dt);
+				ball.do_collision_with(paddle_0.get_rectangle());
+				ball.do_collision_with(paddle_1.get_rectangle());
+
+				Side side;
+				if(check_bounds_for(ball, side)) {
+					bool scored = false;
+					switch (side) {
+						case Side::LEFT:
+							paddle_0.lose();
+							paddle_1.score_up();
+							scored = true;
+							break;
+						case Side::RIGHT:
+							paddle_0.score_up();
+							paddle_1.lose();
+							scored = true;
+							break;
+					}
+
+					if(scored) {
+						if(is_game_over()){
+							state = GameState::GAME_OVER;
+						} else {
+							state = GameState::ROUND_OVER;
+						}
+					}
+				}
 				break;
 			case GameState::ROUND_OVER:
 				break;
@@ -228,29 +255,6 @@ class Game{
 				break;
 		}
 
-		paddle_0.update(dt);
-		paddle_1.update(dt);
-		ball.update(dt);
-		Side side;
-		if(check_bounds_for(ball, side)) {
-			switch (side) {
-				case Side::LEFT:
-					paddle_0.lose();
-					paddle_1.score_up();
-					std::println("GOAL to paddle 1, {}, {} score 0: {} lives 0: {}, score 1: {} lives 1: {}", ball.velocity.x, ball.velocity.y, paddle_0.get_score(), paddle_0.get_lives(), paddle_1.get_score(), paddle_1.get_lives());
-					break;
-				case Side::RIGHT:
-					paddle_0.score_up();
-					paddle_1.lose();
-					std::println("GOAL to paddle 0, {}, {} score 0: {} lives 0: {}, score 1: {} lives 1: {}", ball.velocity.x, ball.velocity.y, paddle_0.get_score(), paddle_0.get_lives(), paddle_1.get_score(), paddle_1.get_lives());
-					break;
-			}
-		}
-		if(!ball.is_still() && is_game_over()){
-			ball.stop();
-		}
-		ball.do_collision_with(paddle_0.get_rectangle());
-		ball.do_collision_with(paddle_1.get_rectangle());
 	}
 
 	void render() const{
