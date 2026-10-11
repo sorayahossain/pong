@@ -226,7 +226,7 @@ class Game{
 					break;
 			}
 		}
-		if(!ball.is_still() && (paddle_0.get_lives() == 0 || paddle_1.get_lives() == 0)){
+		if(!ball.is_still() && is_game_over()){
 			ball.stop();
 		}
 		ball.do_collision_with(paddle_0.get_rectangle());
@@ -247,8 +247,15 @@ class Game{
 			} else {
 				DrawText("Press SPACE to serve!", (int)MARGIN+TEXT_SIZE, WINDOW_HEIGHT - TEXT_SIZE, TEXT_SIZE, TEXT_COLOR);
 			}
+		} else {
+			DrawText(("Player 0: (Lives: " + std::to_string(paddle_0.get_lives()) + "; Score: " + std::to_string(paddle_0.get_score()) + ")").c_str(), (int)MARGIN+TEXT_SIZE, TEXT_SIZE, TEXT_SIZE/2, TEXT_COLOR);
+			DrawText(("Player 1: (Lives: " + std::to_string(paddle_1.get_lives()) + "; Score: " + std::to_string(paddle_1.get_score()) + ")").c_str(), (int)MARGIN+TEXT_SIZE, TEXT_SIZE*2, TEXT_SIZE/2, TEXT_COLOR);
 		}
 		EndDrawing();
+	}
+
+	bool is_game_over(){
+		return paddle_0.get_lives() == 0 || paddle_1.get_lives() == 0;
 	}
 
 	bool check_bounds_for(Ball& b, Side& side){
