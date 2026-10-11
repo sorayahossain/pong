@@ -181,6 +181,11 @@ public:
 		score++;
 	}
 
+	void reset(){
+		lives = 5;
+		score = 0;
+	}
+
 	Rectangle get_rectangle() const{
 		return rectangle;
 	}
@@ -198,6 +203,9 @@ class Game{
 
 	void update(float dt){
 		if(ball.is_still() && IsKeyPressed(KEY_SPACE)){
+			paddle_0.reset();
+			paddle_1.reset();
+			ball.reset();
 			ball.launch();
 		}
 		paddle_0.update(dt);
@@ -233,9 +241,9 @@ class Game{
 		ball.render();
 		if(ball.is_still()){
 			if(paddle_0.get_lives() == 0) {
-				DrawText("Player 1 WIN!", (int)MARGIN+TEXT_SIZE, WINDOW_HEIGHT - TEXT_SIZE, TEXT_SIZE, TEXT_COLOR);
+				DrawText("Player 1 WIN! Press SPACE to restart...", (int)MARGIN+TEXT_SIZE, WINDOW_HEIGHT - TEXT_SIZE, TEXT_SIZE, TEXT_COLOR);
 			} else if (paddle_1.get_lives() == 0){
-				DrawText("Player 0 WIN!", (int)MARGIN+TEXT_SIZE, WINDOW_HEIGHT - TEXT_SIZE, TEXT_SIZE, TEXT_COLOR);
+				DrawText("Player 0 WIN! Press SPACE to restart...", (int)MARGIN+TEXT_SIZE, WINDOW_HEIGHT - TEXT_SIZE, TEXT_SIZE, TEXT_COLOR);
 			} else {
 				DrawText("Press SPACE to serve!", (int)MARGIN+TEXT_SIZE, WINDOW_HEIGHT - TEXT_SIZE, TEXT_SIZE, TEXT_COLOR);
 			}
