@@ -22,6 +22,17 @@ enum class Side{
 	LEFT, RIGHT, TOP, BOTTOM
 };
 
+constexpr std::string_view to_string(Side side) {
+    switch (side) {
+		case Side::LEFT:   return "LEFT";
+		case Side::RIGHT:  return "RIGHT";
+		case Side::TOP:    return "TOP";
+		case Side::BOTTOM: return "BOTTOM";
+    }
+
+    return "UNKNOWN";
+}
+
 enum class Axis{
 	X, Y
 };
@@ -151,7 +162,10 @@ class Game{
 		paddle_0.update(dt);
 		paddle_1.update(dt);
 		ball.update(dt);
-		check_bounds_for(ball);
+		Side side;
+		if(check_bounds_for(ball, side)) {
+			std::println(stdout, "left at {}", to_string(side));
+		}
 		ball.do_collision_with(paddle_0.get_rectangle());
 		ball.do_collision_with(paddle_1.get_rectangle());
 	}
@@ -168,24 +182,40 @@ class Game{
 		EndDrawing();
 	}
 
-	void check_bounds_for(Ball& b){
+	bool check_bounds_for(Ball& b, Side& side){
 		auto& pos = b.position; //create a local reference to the Ball::pos member, for convenience
 		const auto MAX_X = WINDOW_WIDTH - b.radius;
 		const auto MAX_Y = WINDOW_HEIGHT - b.radius;
+
 		if(pos.x < b.radius){
 			pos.x = b.radius;
 			b.bounce(Axis::X);
-		} else if(pos.x > MAX_X){
+			side = Side::LEFT;
+			return true;
+		}
+
+		if(pos.x > MAX_X){
 			pos.x = MAX_X;
 			b.bounce(Axis::X);
+			side = Side::RIGHT;
+			return true;
 		}
+
 		if(pos.y < b.radius){
 			pos.y = b.radius;
 			b.bounce(Axis::Y);
-		} else if(pos.y > MAX_Y){
+			side = Side::TOP;
+			return true;
+		}
+
+		if(pos.y > MAX_Y){
 			pos.y = MAX_Y;
 			b.bounce(Axis::Y);
+			side = Side::BOTTOM;
+			return true;
 		}
+
+		return false;
 	}
 
 public:
