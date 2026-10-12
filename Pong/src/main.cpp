@@ -206,7 +206,7 @@ class Game{
 		switch (state) {
 			case GameState::START_SCREEN:
 				if(IsKeyPressed(KEY_SPACE)){
-					state = GameState::PLAYING;
+					set_state(GameState::PLAYING);
 					paddle_0.reset();
 					paddle_1.reset();
 					ball.reset();
@@ -239,9 +239,9 @@ class Game{
 
 					if(scored) {
 						if(is_game_over()){
-							state = GameState::GAME_OVER;
+							set_state(GameState::GAME_OVER);
 						} else {
-							state = GameState::ROUND_OVER;
+							set_state(GameState::ROUND_OVER);
 						}
 					}
 				}
@@ -249,11 +249,11 @@ class Game{
 			case GameState::ROUND_OVER:
 				ball.reset();
 				ball.launch();
-				state = GameState::PLAYING;
+				set_state(GameState::PLAYING);
 				break;
 			case GameState::GAME_OVER:
 				if(IsKeyPressed(KEY_SPACE)){
-					state = GameState::PLAYING;
+					set_state(GameState::PLAYING);
 					paddle_0.reset();
 					paddle_1.reset();
 					ball.reset();
@@ -292,6 +292,10 @@ class Game{
 		}
 
 		EndDrawing();
+	}
+
+	void set_state(GameState new_state){
+		state = new_state;
 	}
 
 	bool is_game_over(){
@@ -338,6 +342,7 @@ public:
 	Game(std::string title, int width, int height, int fps = 60){
 		InitWindow(width, height, title.c_str());
 		SetTargetFPS(fps);
+		set_state(GameState::START_SCREEN);
 	}
 
 	~Game(){
