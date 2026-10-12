@@ -406,8 +406,21 @@ void StartScreen::update(float dt){
 
 			return 0;
 		};
+		Controller ai_controller = [](const Paddle& paddle, const Ball& ball){
+			Rectangle rectangle = paddle.get_rectangle();
+			float y = rectangle.y + PADDLE_HEIGHT/2;
+			if(y > ball.position.y){
+				return 1;
+			}
+
+			if(y < ball.position.y){
+				return -1;
+			}
+
+			return 0;
+		};
 		game.get_paddle_0().set_controller(human_controller);
-		game.get_paddle_1().set_controller(human_controller);
+		game.get_paddle_1().set_controller(ai_controller);
 		game.set_state(GameState::PLAYING);
 	}
 }
