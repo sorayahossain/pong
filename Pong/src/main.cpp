@@ -196,6 +196,20 @@ enum class GameState {
 	GAME_OVER
 };
 
+class Game;
+
+class Screen {
+protected:
+	Game& game;
+
+public:
+	Screen(Game& game): game{game}{}
+	virtual ~Screen() = default;
+
+	virtual void update(float dt) = 0;
+	virtual void render() const = 0;
+};
+
 class Game{
 	Paddle paddle_0{Side::LEFT};
 	Paddle paddle_1{Side::RIGHT};
