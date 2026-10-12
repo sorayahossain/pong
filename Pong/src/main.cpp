@@ -223,13 +223,8 @@ class PlayingScreen final : public Screen {
 public:
 	using Screen::Screen;
 
-	void update(float dt) override {
-		// not wired yet
-	}
-
-	void render() const override {
-		// not wired yet
-	}
+	void update(float dt) override;
+	void render() const override;
 };
 
 class RoundOverScreen final : public Screen {
@@ -269,39 +264,6 @@ class Game{
 		screen->update(dt);
 
 		switch (state) {
-			case GameState::PLAYING:
-				paddle_0.update(dt);
-				paddle_1.update(dt);
-
-				ball.update(dt);
-				ball.do_collision_with(paddle_0.get_rectangle());
-				ball.do_collision_with(paddle_1.get_rectangle());
-
-				Side side;
-				if(check_bounds_for(ball, side)) {
-					bool scored = false;
-					switch (side) {
-						case Side::LEFT:
-							paddle_0.lose();
-							paddle_1.score_up();
-							scored = true;
-							break;
-						case Side::RIGHT:
-							paddle_0.score_up();
-							paddle_1.lose();
-							scored = true;
-							break;
-					}
-
-					if(scored) {
-						if(is_game_over()){
-							set_state(GameState::GAME_OVER);
-						} else {
-							set_state(GameState::ROUND_OVER);
-						}
-					}
-				}
-				break;
 			case GameState::ROUND_OVER:
 				ball.reset();
 				ball.launch();
@@ -325,7 +287,6 @@ class Game{
 		screen->render();
 
 		switch (state) {
-			case GameState::PLAYING:
 			case GameState::ROUND_OVER:
 				paddle_0.render();
 				paddle_1.render();
@@ -450,6 +411,56 @@ void StartScreen::render() const{
 	game.get_paddle_1().render();
 	game.get_ball().render();
 	DrawText("Press SPACE to serve!", (int)MARGIN+TEXT_SIZE, WINDOW_HEIGHT - TEXT_SIZE, TEXT_SIZE, TEXT_COLOR);
+}
+
+void PlayingScreen::update(float dt){
+	Paddle& paddle_0 = game.get_paddle_0();
+	Paddle& paddle_1 = game.get_paddle_1();
+	Ball& ball = game.get_ball();
+
+	paddle_0.update(dt);
+	paddle_1.update(dt);
+
+	ball.update(dt);
+	ball.do_collision_with(paddle_0.get_rectangle());
+	ball.do_collision_with(paddle_1.get_rectangle());
+
+	Side side;
+	if(game.check_bounds_for(ball, side)) {
+		bool scored = false;
+		switch (side) {
+			case Side::LEFT:
+				paddle_0.lose();
+				paddle_1.score_up();
+				scored = true;
+				break;
+			case Side::RIGHT:
+				paddle_0.score_up();
+				paddle_1.lose();
+				scored = true;
+				break;
+		}
+
+		if(scored) {
+			if(game.is_game_over()){
+				game.set_state(GameState::GAME_OVER);
+			} else {
+				game.set_state(GameState::ROUND_OVER);
+			}
+		}
+	}
+}
+
+void PlayingScreen::render() const{
+	Paddle& paddle_0 = game.get_paddle_0();
+	Paddle& paddle_1 = game.get_paddle_1();
+	Ball& ball = game.get_ball();
+
+	paddle_0.render();
+	paddle_1.render();
+	ball.render();
+	DrawText(("Player 0: (lives: " + std::to_string(paddle_0.get_lives()) + "; Score: " + std::to_string(paddle_0.get_score()) + ")").c_str(), (int)MARGIN+TEXT_SIZE, TEXT_SIZE, TEXT_SIZE/2, TEXT_COLOR);
+	DrawText(("Player 1: (lives: " + std::to_string(paddle_1.get_lives()) + "; Score: " + std::to_string(paddle_1.get_score()) + ")").c_str(), (int)MARGIN+TEXT_SIZE, TEXT_SIZE*2, TEXT_SIZE/2, TEXT_COLOR);
 }
 
 int main(){
