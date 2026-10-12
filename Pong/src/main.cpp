@@ -197,6 +197,24 @@ enum class GameState {
 	GAME_OVER
 };
 
+class Scoreboard {
+public:
+	Scoreboard(){
+	}
+
+	void reset(){
+	}
+
+	void score_up(Side side){
+	}
+
+	bool is_game_over(){
+	}
+
+	void render() const{
+	}
+};
+
 class Game;
 
 class Screen {
