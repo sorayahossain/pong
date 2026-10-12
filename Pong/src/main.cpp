@@ -216,6 +216,13 @@ public:
 	}
 
 	void score_up(Side side){
+		if(side == Side::LEFT){
+			paddle_0_score++;
+			paddle_1_lives--;
+		} else {
+			paddle_1_score++;
+			paddle_0_lives--;
+		}
 	}
 
 	bool is_game_over(){
