@@ -15,6 +15,7 @@ constexpr auto WINDOW_WIDTH = 1080;
 constexpr auto WINDOW_HEIGHT = 720;
 constexpr auto PADDLE_SPEED = 400.0f;
 constexpr auto PADDLE_WIDTH = 14.0f;
+constexpr auto BALL_MAX_SPEED = 1500.0f;
 constexpr auto PADDLE_HEIGHT = 80.0f;
 constexpr auto LAUNCH_VELOCITY = Vector2(180.0f, -350.0f);
 constexpr auto BACKGROUND_COLOR = BLACK;
@@ -78,26 +79,24 @@ struct Ball{
 
 	void speed_up(Axis axis, float delta){
 		if(axis == Axis::X){
-			if(velocity.x > 1000.0f || velocity.x < -1000.0f){
-				return;
-			}
-
 			if(velocity.x > 0){
 				velocity.x += delta;
 			} else {
 				velocity.x -= delta;
 			}
 		} else {
-			if(velocity.y > 600.0f || velocity.y < -600.0f){
-				return;
-			}
-
 			if(velocity.y > 0){
 				velocity.y += delta;
 			} else {
 				velocity.y -= delta;
 			}
 		}
+
+		float capped_speed = std::clamp(Vector2Length(velocity), 0.0f, BALL_MAX_SPEED);
+		float angle = std::atan2(velocity.y, velocity.x);
+
+		velocity.x = std::cos(angle)*capped_speed;
+		velocity.y = std::sin(angle)*capped_speed;
 	}
 
 	void do_collision_with(Rectangle r){
