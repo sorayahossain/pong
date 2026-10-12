@@ -449,15 +449,10 @@ void PlayingScreen::update(float dt){
 }
 
 void PlayingScreen::render() const{
-	Paddle& paddle_0 = game.get_paddle_0();
-	Paddle& paddle_1 = game.get_paddle_1();
-	Ball& ball = game.get_ball();
-
-	paddle_0.render();
-	paddle_1.render();
-	ball.render();
-	DrawText(("Player 0: (lives: " + std::to_string(paddle_0.get_lives()) + "; Score: " + std::to_string(paddle_0.get_score()) + ")").c_str(), (int)MARGIN+TEXT_SIZE, TEXT_SIZE, TEXT_SIZE/2, TEXT_COLOR);
-	DrawText(("Player 1: (lives: " + std::to_string(paddle_1.get_lives()) + "; Score: " + std::to_string(paddle_1.get_score()) + ")").c_str(), (int)MARGIN+TEXT_SIZE, TEXT_SIZE*2, TEXT_SIZE/2, TEXT_COLOR);
+	game.get_paddle_0().render();
+	game.get_paddle_1().render();
+	game.get_ball().render();
+	game.get_scoreboard().render();
 }
 
 void RoundOverScreen::update(float dt){
@@ -467,15 +462,10 @@ void RoundOverScreen::update(float dt){
 }
 
 void RoundOverScreen::render() const{
-	Paddle& paddle_0 = game.get_paddle_0();
-	Paddle& paddle_1 = game.get_paddle_1();
-	Ball& ball = game.get_ball();
-
-	paddle_0.render();
-	paddle_1.render();
-	ball.render();
-	DrawText(("Player 0: (lives: " + std::to_string(paddle_0.get_lives()) + "; Score: " + std::to_string(paddle_0.get_score()) + ")").c_str(), (int)MARGIN+TEXT_SIZE, TEXT_SIZE, TEXT_SIZE/2, TEXT_COLOR);
-	DrawText(("Player 1: (lives: " + std::to_string(paddle_1.get_lives()) + "; Score: " + std::to_string(paddle_1.get_score()) + ")").c_str(), (int)MARGIN+TEXT_SIZE, TEXT_SIZE*2, TEXT_SIZE/2, TEXT_COLOR);
+	game.get_paddle_0().render();
+	game.get_paddle_1().render();
+	game.get_ball().render();
+	game.get_scoreboard().render();
 }
 
 void GameOverScreen::update(float dt){
