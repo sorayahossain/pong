@@ -5,6 +5,7 @@
 #include <vector>
 #include <memory>
 #include <print>
+#include <functional>
 
 using uint = uint32_t;
 
@@ -120,23 +121,30 @@ struct Ball{
 	}
 };
 
+class Paddle;
+
+using Controller = std::function<int(const Paddle&, const Ball&)>;
+
 class Paddle{
 	Rectangle rectangle{0.0f, 0.0f, PADDLE_WIDTH, PADDLE_HEIGHT};
 	Color color{RAYWHITE};
 	Side side{Side::LEFT};
+	Controller controller;
 
 public:
 	Paddle(Side position): side{position}{
 		reset();
 	}
 
-	void update(float dt){
+	void update(Ball& ball, float dt){
 		if(side == Side::LEFT || side == Side::RIGHT){
-			if(IsKeyDown(KEY_UP)){
-				rectangle.y -= PADDLE_SPEED * dt;
-			}
-			if(IsKeyDown(KEY_DOWN)){
-				rectangle.y += PADDLE_SPEED * dt;
+			switch(controller(*this, ball)){
+				case -1:
+					rectangle.y += PADDLE_SPEED * dt;
+					break;
+				case 1:
+					rectangle.y -= PADDLE_SPEED * dt;
+					break;
 			}
 			const auto MIN_Y = 0.0f;
 			const auto MAX_Y = WINDOW_HEIGHT - rectangle.height;
@@ -146,6 +154,10 @@ public:
 
 	void render() const{
 		DrawRectangleRec(rectangle, color);
+	}
+
+	void set_controller(Controller new_controller){
+		controller = new_controller;
 	}
 
 	void reset(){
@@ -383,6 +395,19 @@ void StartScreen::update(float dt){
 		game.get_ball().reset();
 		game.get_ball().launch();
 		game.get_scoreboard().reset();
+		Controller human_controller = [](const Paddle& paddle, const Ball& ball){
+			if(IsKeyDown(KEY_UP) && !IsKeyDown(KEY_DOWN)){
+				return 1;
+			}
+
+			if(!IsKeyPressed(KEY_UP) && IsKeyDown(KEY_DOWN)){
+				return -1;
+			}
+
+			return 0;
+		};
+		game.get_paddle_0().set_controller(human_controller);
+		game.get_paddle_1().set_controller(human_controller);
 		game.set_state(GameState::PLAYING);
 	}
 }
@@ -399,8 +424,8 @@ void PlayingScreen::update(float dt){
 	Paddle& paddle_1 = game.get_paddle_1();
 	Ball& ball = game.get_ball();
 
-	paddle_0.update(dt);
-	paddle_1.update(dt);
+	paddle_0.update(ball, dt);
+	paddle_1.update(ball, dt);
 
 	ball.update(dt);
 	ball.do_collision_with(paddle_0.get_rectangle());
