@@ -230,6 +230,8 @@ public:
 	}
 
 	void render() const{
+		DrawText(("Player 0: (lives: " + std::to_string(paddle_0_lives) + "; Score: " + std::to_string(paddle_0_score) + ")").c_str(), (int)MARGIN+TEXT_SIZE, TEXT_SIZE, TEXT_SIZE/2, TEXT_COLOR);
+		DrawText(("Player 1: (lives: " + std::to_string(paddle_1_lives) + "; Score: " + std::to_string(paddle_1_score) + ")").c_str(), (int)MARGIN+TEXT_SIZE, TEXT_SIZE*2, TEXT_SIZE/2, TEXT_COLOR);
 	}
 };
 
