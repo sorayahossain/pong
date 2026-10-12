@@ -239,13 +239,8 @@ class GameOverScreen final : public Screen {
 public:
 	using Screen::Screen;
 
-	void update(float dt) override {
-		// not wired yet
-	}
-
-	void render() const override {
-		// not wired yet
-	}
+	void update(float dt) override;
+	void render() const override;
 };
 
 class Game{
@@ -257,35 +252,12 @@ class Game{
 
 	void update(float dt){
 		screen->update(dt);
-
-		switch (state) {
-			case GameState::GAME_OVER:
-				if(IsKeyPressed(KEY_SPACE)){
-					set_state(GameState::PLAYING);
-					paddle_0.reset();
-					paddle_1.reset();
-					ball.reset();
-					ball.launch();
-				}
-				break;
-		}
 	}
 
 	void render() const{
 		BeginDrawing();
 		ClearBackground(BACKGROUND_COLOR);
 		screen->render();
-
-		switch (state) {
-			case GameState::GAME_OVER:
-				if(paddle_0.get_lives() == 0) {
-					DrawText("Player 1 WIN! Press SPACE to restart...", (int)MARGIN+TEXT_SIZE, WINDOW_HEIGHT - TEXT_SIZE, TEXT_SIZE, TEXT_COLOR);
-				} else {
-					DrawText("Player 0 WIN! Press SPACE to restart...", (int)MARGIN+TEXT_SIZE, WINDOW_HEIGHT - TEXT_SIZE, TEXT_SIZE, TEXT_COLOR);
-				}
-				break;
-		}
-
 		EndDrawing();
 	}
 
@@ -462,6 +434,24 @@ void RoundOverScreen::render() const{
 	ball.render();
 	DrawText(("Player 0: (lives: " + std::to_string(paddle_0.get_lives()) + "; Score: " + std::to_string(paddle_0.get_score()) + ")").c_str(), (int)MARGIN+TEXT_SIZE, TEXT_SIZE, TEXT_SIZE/2, TEXT_COLOR);
 	DrawText(("Player 1: (lives: " + std::to_string(paddle_1.get_lives()) + "; Score: " + std::to_string(paddle_1.get_score()) + ")").c_str(), (int)MARGIN+TEXT_SIZE, TEXT_SIZE*2, TEXT_SIZE/2, TEXT_COLOR);
+}
+
+void GameOverScreen::update(float dt){
+	if(IsKeyPressed(KEY_SPACE)){
+		game.get_paddle_0().reset();
+		game.get_paddle_1().reset();
+		game.get_ball().reset();
+		game.get_ball().launch();
+		game.set_state(GameState::PLAYING);
+	}
+}
+
+void GameOverScreen::render() const{
+	if(game.get_paddle_0().get_lives() == 0) {
+		DrawText("Player 1 WIN! Press SPACE to restart...", (int)MARGIN+TEXT_SIZE, WINDOW_HEIGHT - TEXT_SIZE, TEXT_SIZE, TEXT_COLOR);
+	} else {
+		DrawText("Player 0 WIN! Press SPACE to restart...", (int)MARGIN+TEXT_SIZE, WINDOW_HEIGHT - TEXT_SIZE, TEXT_SIZE, TEXT_COLOR);
+	}
 }
 
 int main(){
