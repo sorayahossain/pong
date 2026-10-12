@@ -437,11 +437,11 @@ public:
 
 void StartScreen::update(float dt){
 	if(IsKeyPressed(KEY_SPACE)){
-		game.set_state(GameState::PLAYING);
 		game.get_paddle_0().reset();
 		game.get_paddle_1().reset();
 		game.get_ball().reset();
 		game.get_ball().launch();
+		game.set_state(GameState::PLAYING);
 	}
 }
 
