@@ -210,6 +210,58 @@ public:
 	virtual void render() const = 0;
 };
 
+class StartScreen final : public Screen {
+public:
+	using Screen::Screen;
+
+	void update(float dt) override {
+		// not wired yet
+	}
+
+	void render() const override {
+		// not wired yet
+	}
+};
+
+class PlayingScreen final : public Screen {
+public:
+	using Screen::Screen;
+
+	void update(float dt) override {
+		// not wired yet
+	}
+
+	void render() const override {
+		// not wired yet
+	}
+};
+
+class RoundOverScreen final : public Screen {
+public:
+	using Screen::Screen;
+
+	void update(float dt) override {
+		// not wired yet
+	}
+
+	void render() const override {
+		// not wired yet
+	}
+};
+
+class GameOverScreen final : public Screen {
+public:
+	using Screen::Screen;
+
+	void update(float dt) override {
+		// not wired yet
+	}
+
+	void render() const override {
+		// not wired yet
+	}
+};
+
 class Game{
 	Paddle paddle_0{Side::LEFT};
 	Paddle paddle_1{Side::RIGHT};
