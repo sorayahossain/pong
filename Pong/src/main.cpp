@@ -429,13 +429,11 @@ void PlayingScreen::update(float dt){
 		bool scored = false;
 		switch (side) {
 			case Side::LEFT:
-				paddle_0.lose();
-				paddle_1.score_up();
+				game.get_scoreboard().score_up(Side::RIGHT);
 				scored = true;
 				break;
 			case Side::RIGHT:
-				paddle_0.score_up();
-				paddle_1.lose();
+				game.get_scoreboard().score_up(Side::LEFT);
 				scored = true;
 				break;
 		}
