@@ -3,6 +3,7 @@
 #include <string>
 #include <algorithm>
 #include <vector>
+#include <memory>
 #include <print>
 
 using uint = uint32_t;
@@ -267,6 +268,7 @@ class Game{
 	Paddle paddle_1{Side::RIGHT};
 	Ball ball;
 	GameState state = GameState::START_SCREEN;
+	std::unique_ptr<Screen> screen;
 
 	void update(float dt){
 		switch (state) {
@@ -362,6 +364,20 @@ class Game{
 
 	void set_state(GameState new_state){
 		state = new_state;
+		switch (state) {
+			case GameState::START_SCREEN:
+				screen = std::make_unique<StartScreen>(*this);
+				break;
+			case GameState::PLAYING:
+				screen = std::make_unique<PlayingScreen>(*this);
+				break;
+			case GameState::ROUND_OVER:
+				screen = std::make_unique<RoundOverScreen>(*this);
+				break;
+			case GameState::GAME_OVER:
+				screen = std::make_unique<GameOverScreen>(*this);
+				break;
+		}
 	}
 
 	bool is_game_over(){
