@@ -287,6 +287,7 @@ class Game{
 	Ball ball;
 	GameState state = GameState::START_SCREEN;
 	std::unique_ptr<Screen> screen;
+	Scoreboard scoreboard;
 
 	void update(float dt){
 		screen->update(dt);
@@ -374,6 +375,10 @@ public:
 				screen = std::make_unique<GameOverScreen>(*this);
 				break;
 		}
+	}
+
+	Scoreboard& get_scoreboard(){
+		return scoreboard;
 	}
 
 	Paddle& get_paddle_0() {
