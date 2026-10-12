@@ -439,7 +439,7 @@ void PlayingScreen::update(float dt){
 		}
 
 		if(scored) {
-			if(game.is_game_over()){
+			if(game.get_scoreboard().is_game_over()){
 				game.set_state(GameState::GAME_OVER);
 			} else {
 				game.set_state(GameState::ROUND_OVER);
