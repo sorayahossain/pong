@@ -215,13 +215,8 @@ class StartScreen final : public Screen {
 public:
 	using Screen::Screen;
 
-	void update(float dt) override {
-		// not wired yet
-	}
-
-	void render() const override {
-		// not wired yet
-	}
+	void update(float dt) override;
+	void render() const override;
 };
 
 class PlayingScreen final : public Screen {
@@ -271,16 +266,9 @@ class Game{
 	std::unique_ptr<Screen> screen;
 
 	void update(float dt){
+		screen->update(dt);
+
 		switch (state) {
-			case GameState::START_SCREEN:
-				if(IsKeyPressed(KEY_SPACE)){
-					set_state(GameState::PLAYING);
-					paddle_0.reset();
-					paddle_1.reset();
-					ball.reset();
-					ball.launch();
-				}
-				break;
 			case GameState::PLAYING:
 				paddle_0.update(dt);
 				paddle_1.update(dt);
@@ -334,14 +322,9 @@ class Game{
 	void render() const{
 		BeginDrawing();
 		ClearBackground(BACKGROUND_COLOR);
+		screen->render();
 
 		switch (state) {
-			case GameState::START_SCREEN:
-				paddle_0.render();
-				paddle_1.render();
-				ball.render();
-				DrawText("Press SPACE to serve!", (int)MARGIN+TEXT_SIZE, WINDOW_HEIGHT - TEXT_SIZE, TEXT_SIZE, TEXT_COLOR);
-				break;
 			case GameState::PLAYING:
 			case GameState::ROUND_OVER:
 				paddle_0.render();
@@ -360,24 +343,6 @@ class Game{
 		}
 
 		EndDrawing();
-	}
-
-	void set_state(GameState new_state){
-		state = new_state;
-		switch (state) {
-			case GameState::START_SCREEN:
-				screen = std::make_unique<StartScreen>(*this);
-				break;
-			case GameState::PLAYING:
-				screen = std::make_unique<PlayingScreen>(*this);
-				break;
-			case GameState::ROUND_OVER:
-				screen = std::make_unique<RoundOverScreen>(*this);
-				break;
-			case GameState::GAME_OVER:
-				screen = std::make_unique<GameOverScreen>(*this);
-				break;
-		}
 	}
 
 	bool is_game_over(){
@@ -438,7 +403,54 @@ public:
 			render();
 		}
 	}
+
+	void set_state(GameState new_state){
+		state = new_state;
+		switch (state) {
+			case GameState::START_SCREEN:
+				screen = std::make_unique<StartScreen>(*this);
+				break;
+			case GameState::PLAYING:
+				screen = std::make_unique<PlayingScreen>(*this);
+				break;
+			case GameState::ROUND_OVER:
+				screen = std::make_unique<RoundOverScreen>(*this);
+				break;
+			case GameState::GAME_OVER:
+				screen = std::make_unique<GameOverScreen>(*this);
+				break;
+		}
+	}
+
+	Paddle& get_paddle_0() {
+		return paddle_0;
+	}
+
+	Paddle& get_paddle_1() {
+		return paddle_1;
+	}
+
+	Ball& get_ball() {
+		return ball;
+	}
 };
+
+void StartScreen::update(float dt){
+	if(IsKeyPressed(KEY_SPACE)){
+		game.set_state(GameState::PLAYING);
+		game.get_paddle_0().reset();
+		game.get_paddle_1().reset();
+		game.get_ball().reset();
+		game.get_ball().launch();
+	}
+}
+
+void StartScreen::render() const{
+	game.get_paddle_0().render();
+	game.get_paddle_1().render();
+	game.get_ball().render();
+	DrawText("Press SPACE to serve!", (int)MARGIN+TEXT_SIZE, WINDOW_HEIGHT - TEXT_SIZE, TEXT_SIZE, TEXT_COLOR);
+}
 
 int main(){
 	Game game("Pong!", WINDOW_WIDTH, WINDOW_HEIGHT);
