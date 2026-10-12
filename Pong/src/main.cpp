@@ -306,6 +306,25 @@ class Game{
 		EndDrawing();
 	}
 
+public:
+	Game(std::string title, int width, int height, int fps = 60){
+		InitWindow(width, height, title.c_str());
+		SetTargetFPS(fps);
+		set_state(GameState::START_SCREEN);
+	}
+
+	~Game(){
+		CloseWindow();
+	}
+
+	void run(){
+		while(!WindowShouldClose()){
+			auto dt = GetFrameTime();
+			update(dt);
+			render();
+		}
+	}
+
 	bool is_game_over(){
 		return paddle_0.get_lives() == 0 || paddle_1.get_lives() == 0;
 	}
@@ -344,25 +363,6 @@ class Game{
 		}
 
 		return false;
-	}
-
-public:
-	Game(std::string title, int width, int height, int fps = 60){
-		InitWindow(width, height, title.c_str());
-		SetTargetFPS(fps);
-		set_state(GameState::START_SCREEN);
-	}
-
-	~Game(){
-		CloseWindow();
-	}
-
-	void run(){
-		while(!WindowShouldClose()){
-			auto dt = GetFrameTime();
-			update(dt);
-			render();
-		}
 	}
 
 	void set_state(GameState new_state){
