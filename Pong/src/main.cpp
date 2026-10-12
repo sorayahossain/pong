@@ -485,13 +485,14 @@ void PlayingScreen::update(float dt){
 	paddle_1.update(balls, dt);
 
 	bool scored = false;
+	uint bounces = 0;
 	for(Ball& ball : balls){
 		ball.update(dt);
 		if(ball.do_collision_with(paddle_0.get_rectangle())){
-			game.paddle_bounced();
+			bounces++;
 		}
 		if(ball.do_collision_with(paddle_1.get_rectangle())){
-			game.paddle_bounced();
+			bounces++;
 		}
 
 		Side side;
@@ -507,6 +508,10 @@ void PlayingScreen::update(float dt){
 					break;
 			}
 		}
+	}
+
+	for(uint i = 0; i < bounces; i++){
+		game.paddle_bounced();
 	}
 
 	if(scored) {
