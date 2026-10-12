@@ -385,14 +385,31 @@ public:
 	std::vector<Ball>& get_balls() {
 		return balls;
 	}
+
+	void reset_balls(){
+		balls.clear();
+		balls.emplace_back();
+	}
+
+	void serve_all_balls(){
+		for(Ball& ball: balls){
+			ball.launch();
+		}
+	}
+
+	void render_balls() const{
+		for(const Ball& ball : balls){
+			ball.render();
+		}
+	}
 };
 
 void StartScreen::update(float dt){
 	if(IsKeyPressed(KEY_SPACE)){
 		game.get_paddle_0().reset();
 		game.get_paddle_1().reset();
-		game.get_ball().reset();
-		game.get_ball().launch();
+		game.reset_balls();
+		game.serve_all_balls();
 		game.get_scoreboard().reset();
 
 		Controller human_controller = [](const Paddle& paddle, const std::vector<Ball> balls){
@@ -441,42 +458,44 @@ void StartScreen::update(float dt){
 void StartScreen::render() const{
 	game.get_paddle_0().render();
 	game.get_paddle_1().render();
-	game.get_ball().render();
+	game.render_balls();
 	DrawText("Press SPACE to serve!", (int)MARGIN+TEXT_SIZE, WINDOW_HEIGHT - TEXT_SIZE, TEXT_SIZE, TEXT_COLOR);
 }
 
 void PlayingScreen::update(float dt){
 	Paddle& paddle_0 = game.get_paddle_0();
 	Paddle& paddle_1 = game.get_paddle_1();
-	Ball& ball = game.get_ball();
+    std::vector<Ball>& balls = game.get_balls();
 
-	paddle_0.update(ball, dt);
-	paddle_1.update(ball, dt);
+	paddle_0.update(balls, dt);
+	paddle_1.update(balls, dt);
 
-	ball.update(dt);
-	ball.do_collision_with(paddle_0.get_rectangle());
-	ball.do_collision_with(paddle_1.get_rectangle());
+	bool scored = false;
+	for(Ball& ball : balls){
+		ball.update(dt);
+		ball.do_collision_with(paddle_0.get_rectangle());
+		ball.do_collision_with(paddle_1.get_rectangle());
 
-	Side side;
-	if(game.check_bounds_for(ball, side)) {
-		bool scored = false;
-		switch (side) {
-			case Side::LEFT:
-				game.get_scoreboard().score_up(Side::RIGHT);
-				scored = true;
-				break;
-			case Side::RIGHT:
-				game.get_scoreboard().score_up(Side::LEFT);
-				scored = true;
-				break;
-		}
-
-		if(scored) {
-			if(game.get_scoreboard().is_game_over()){
-				game.set_state(GameState::GAME_OVER);
-			} else {
-				game.set_state(GameState::ROUND_OVER);
+		Side side;
+		if(game.check_bounds_for(ball, side)) {
+			switch (side) {
+				case Side::LEFT:
+					game.get_scoreboard().score_up(Side::RIGHT);
+					scored = true;
+					break;
+				case Side::RIGHT:
+					game.get_scoreboard().score_up(Side::LEFT);
+					scored = true;
+					break;
 			}
+		}
+	}
+
+	if(scored) {
+		if(game.get_scoreboard().is_game_over()){
+			game.set_state(GameState::GAME_OVER);
+		} else {
+			game.set_state(GameState::ROUND_OVER);
 		}
 	}
 }
@@ -484,20 +503,20 @@ void PlayingScreen::update(float dt){
 void PlayingScreen::render() const{
 	game.get_paddle_0().render();
 	game.get_paddle_1().render();
-	game.get_ball().render();
+	game.render_balls();
 	game.get_scoreboard().render();
 }
 
 void RoundOverScreen::update(float dt){
-	game.get_ball().reset();
-	game.get_ball().launch();
+	game.reset_balls();
+	game.serve_all_balls();
 	game.set_state(GameState::PLAYING);
 }
 
 void RoundOverScreen::render() const{
 	game.get_paddle_0().render();
 	game.get_paddle_1().render();
-	game.get_ball().render();
+	game.render_balls();
 	game.get_scoreboard().render();
 }
 
@@ -505,8 +524,8 @@ void GameOverScreen::update(float dt){
 	if(IsKeyPressed(KEY_SPACE)){
 		game.get_paddle_0().reset();
 		game.get_paddle_1().reset();
-		game.get_ball().reset();
-		game.get_ball().launch();
+		game.reset_balls();
+		game.serve_all_balls();
 		game.get_scoreboard().reset();
 		game.set_state(GameState::PLAYING);
 	}
