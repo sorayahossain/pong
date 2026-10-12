@@ -198,11 +198,21 @@ enum class GameState {
 };
 
 class Scoreboard {
+	uint paddle_0_lives;
+	uint paddle_1_lives;
+	uint paddle_0_score;
+	uint paddle_1_score;
+
 public:
 	Scoreboard(){
+		reset();
 	}
 
 	void reset(){
+		paddle_0_lives = 5;
+		paddle_1_lives = 5;
+		paddle_0_score = 0;
+		paddle_1_score = 0;
 	}
 
 	void score_up(Side side){
