@@ -99,9 +99,9 @@ struct Ball{
 		velocity.y = std::sin(angle)*capped_speed;
 	}
 
-	void do_collision_with(Rectangle r){
+	bool do_collision_with(Rectangle r){
 		if(!CheckCollisionRecs(get_rectangle(), r)){
-			return;
+			return false;
 		}
 
 		Rectangle overlap = GetCollisionRec(get_rectangle(), r);
@@ -111,12 +111,14 @@ struct Ball{
 			bounce(Axis::X);
 			nudge(Axis::X, dx);
 			speed_up(Axis::X, 40.0f);
-		} else{
+		} else {
 			float dy = (velocity.y > 0.0f) ? -overlap.height : overlap.height;
 			nudge(Axis::Y, dy);
 			bounce(Axis::Y);
 			speed_up(Axis::Y, 40.0f);
 		}
+
+		return true;
 	}
 };
 
@@ -285,6 +287,7 @@ class Game{
 	GameState state = GameState::START_SCREEN;
 	std::unique_ptr<Screen> screen;
 	Scoreboard scoreboard;
+	uint paddle_bounces;
 
 	void update(float dt){
 		screen->update(dt);
@@ -386,7 +389,18 @@ public:
 		return balls;
 	}
 
+	void paddle_bounced(){
+		paddle_bounces++;
+		if(paddle_bounces == 5){
+			balls.emplace_back();
+			Ball& ball = balls.back();
+			ball.launch();
+			paddle_bounces = 0;
+		}
+	}
+
 	void reset_balls(){
+		paddle_bounces = 0;
 		balls.clear();
 		balls.emplace_back();
 	}
@@ -473,8 +487,12 @@ void PlayingScreen::update(float dt){
 	bool scored = false;
 	for(Ball& ball : balls){
 		ball.update(dt);
-		ball.do_collision_with(paddle_0.get_rectangle());
-		ball.do_collision_with(paddle_1.get_rectangle());
+		if(ball.do_collision_with(paddle_0.get_rectangle())){
+			game.paddle_bounced();
+		}
+		if(ball.do_collision_with(paddle_1.get_rectangle())){
+			game.paddle_bounced();
+		}
 
 		Side side;
 		if(game.check_bounds_for(ball, side)) {
