@@ -122,7 +122,7 @@ struct Ball{
 
 class Paddle;
 
-using Controller = std::function<int(const Paddle&, const Ball&)>;
+using Controller = std::function<int(const Paddle&, const std::vector<Ball>)>;
 
 class Paddle{
 	Rectangle rectangle{0.0f, 0.0f, PADDLE_WIDTH, PADDLE_HEIGHT};
@@ -135,9 +135,9 @@ public:
 		reset();
 	}
 
-	void update(Ball& ball, float dt){
+	void update(std::vector<Ball> balls, float dt){
 		if(side == Side::LEFT || side == Side::RIGHT){
-			switch(controller(*this, ball)){
+			switch(controller(*this, balls)){
 				case -1:
 					rectangle.y += PADDLE_SPEED * dt;
 					break;
@@ -394,7 +394,8 @@ void StartScreen::update(float dt){
 		game.get_ball().reset();
 		game.get_ball().launch();
 		game.get_scoreboard().reset();
-		Controller human_controller = [](const Paddle& paddle, const Ball& ball){
+
+		Controller human_controller = [](const Paddle& paddle, const std::vector<Ball> balls){
 			if(IsKeyDown(KEY_UP) && !IsKeyDown(KEY_DOWN)){
 				return 1;
 			}
@@ -405,19 +406,32 @@ void StartScreen::update(float dt){
 
 			return 0;
 		};
-		Controller ai_controller = [](const Paddle& paddle, const Ball& ball){
+
+		Controller ai_controller = [](const Paddle& paddle, const std::vector<Ball> balls){
 			Rectangle rectangle = paddle.get_rectangle();
+
+			const Ball* nearest_ball = &balls.front();
+			float distance = std::abs(rectangle.x - nearest_ball->position.x);
+			for (const Ball& ball : balls){
+				float new_distance = std::abs(rectangle.x - ball.position.x);
+				if(new_distance < distance){
+					distance = new_distance;
+					nearest_ball = &ball;
+				}
+			}
+
 			float y = rectangle.y + PADDLE_HEIGHT/2;
-			if(y > ball.position.y){
+			if(y > nearest_ball->position.y){
 				return 1;
 			}
 
-			if(y < ball.position.y){
+			if(y < nearest_ball->position.y){
 				return -1;
 			}
 
 			return 0;
 		};
+
 		game.get_paddle_0().set_controller(human_controller);
 		game.get_paddle_1().set_controller(ai_controller);
 		game.set_state(GameState::PLAYING);
