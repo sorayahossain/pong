@@ -231,13 +231,8 @@ class RoundOverScreen final : public Screen {
 public:
 	using Screen::Screen;
 
-	void update(float dt) override {
-		// not wired yet
-	}
-
-	void render() const override {
-		// not wired yet
-	}
+	void update(float dt) override;
+	void render() const override;
 };
 
 class GameOverScreen final : public Screen {
@@ -264,11 +259,6 @@ class Game{
 		screen->update(dt);
 
 		switch (state) {
-			case GameState::ROUND_OVER:
-				ball.reset();
-				ball.launch();
-				set_state(GameState::PLAYING);
-				break;
 			case GameState::GAME_OVER:
 				if(IsKeyPressed(KEY_SPACE)){
 					set_state(GameState::PLAYING);
@@ -287,13 +277,6 @@ class Game{
 		screen->render();
 
 		switch (state) {
-			case GameState::ROUND_OVER:
-				paddle_0.render();
-				paddle_1.render();
-				ball.render();
-				DrawText(("Player 0: (lives: " + std::to_string(paddle_0.get_lives()) + "; Score: " + std::to_string(paddle_0.get_score()) + ")").c_str(), (int)MARGIN+TEXT_SIZE, TEXT_SIZE, TEXT_SIZE/2, TEXT_COLOR);
-				DrawText(("Player 1: (lives: " + std::to_string(paddle_1.get_lives()) + "; Score: " + std::to_string(paddle_1.get_score()) + ")").c_str(), (int)MARGIN+TEXT_SIZE, TEXT_SIZE*2, TEXT_SIZE/2, TEXT_COLOR);
-				break;
 			case GameState::GAME_OVER:
 				if(paddle_0.get_lives() == 0) {
 					DrawText("Player 1 WIN! Press SPACE to restart...", (int)MARGIN+TEXT_SIZE, WINDOW_HEIGHT - TEXT_SIZE, TEXT_SIZE, TEXT_COLOR);
@@ -452,6 +435,24 @@ void PlayingScreen::update(float dt){
 }
 
 void PlayingScreen::render() const{
+	Paddle& paddle_0 = game.get_paddle_0();
+	Paddle& paddle_1 = game.get_paddle_1();
+	Ball& ball = game.get_ball();
+
+	paddle_0.render();
+	paddle_1.render();
+	ball.render();
+	DrawText(("Player 0: (lives: " + std::to_string(paddle_0.get_lives()) + "; Score: " + std::to_string(paddle_0.get_score()) + ")").c_str(), (int)MARGIN+TEXT_SIZE, TEXT_SIZE, TEXT_SIZE/2, TEXT_COLOR);
+	DrawText(("Player 1: (lives: " + std::to_string(paddle_1.get_lives()) + "; Score: " + std::to_string(paddle_1.get_score()) + ")").c_str(), (int)MARGIN+TEXT_SIZE, TEXT_SIZE*2, TEXT_SIZE/2, TEXT_COLOR);
+}
+
+void RoundOverScreen::update(float dt){
+	game.get_ball().reset();
+	game.get_ball().launch();
+	game.set_state(GameState::PLAYING);
+}
+
+void RoundOverScreen::render() const{
 	Paddle& paddle_0 = game.get_paddle_0();
 	Paddle& paddle_1 = game.get_paddle_1();
 	Ball& ball = game.get_ball();
