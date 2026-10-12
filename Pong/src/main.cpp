@@ -124,8 +124,6 @@ class Paddle{
 	Rectangle rectangle{0.0f, 0.0f, PADDLE_WIDTH, PADDLE_HEIGHT};
 	Color color{RAYWHITE};
 	Side side{Side::LEFT};
-	uint lives = 5;
-	uint score = 0;
 
 public:
 	Paddle(Side position): side{position}{
@@ -150,28 +148,7 @@ public:
 		DrawRectangleRec(rectangle, color);
 	}
 
-	uint get_score() const{
-		return score;
-	}
-
-	uint get_lives() const{
-		return lives;
-	}
-
-	void lose() {
-		if(lives > 0){
-			lives--;
-		}
-	}
-
-	void score_up() {
-		score++;
-	}
-
 	void reset(){
-		lives = 5;
-		score = 0;
-
 		if(side == Side::LEFT){
 			reset_position(MARGIN, (WINDOW_HEIGHT - PADDLE_HEIGHT) / 2.0f);
 		}
@@ -326,10 +303,6 @@ public:
 			update(dt);
 			render();
 		}
-	}
-
-	bool is_game_over(){
-		return paddle_0.get_lives() == 0 || paddle_1.get_lives() == 0;
 	}
 
 	bool check_bounds_for(Ball& b, Side& side){
