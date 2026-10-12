@@ -225,13 +225,22 @@ public:
 		}
 	}
 
-	bool is_game_over(){
+	bool is_game_over() const{
 		return paddle_0_lives == 0 || paddle_1_lives == 0;
 	}
 
 	void render() const{
-		DrawText(("Player 0: (lives: " + std::to_string(paddle_0_lives) + "; Score: " + std::to_string(paddle_0_score) + ")").c_str(), (int)MARGIN+TEXT_SIZE, TEXT_SIZE, TEXT_SIZE/2, TEXT_COLOR);
-		DrawText(("Player 1: (lives: " + std::to_string(paddle_1_lives) + "; Score: " + std::to_string(paddle_1_score) + ")").c_str(), (int)MARGIN+TEXT_SIZE, TEXT_SIZE*2, TEXT_SIZE/2, TEXT_COLOR);
+		if(!is_game_over()){
+			DrawText(("Player 0: (lives: " + std::to_string(paddle_0_lives) + "; Score: " + std::to_string(paddle_0_score) + ")").c_str(), (int)MARGIN+TEXT_SIZE, TEXT_SIZE, TEXT_SIZE/2, TEXT_COLOR);
+			DrawText(("Player 1: (lives: " + std::to_string(paddle_1_lives) + "; Score: " + std::to_string(paddle_1_score) + ")").c_str(), (int)MARGIN+TEXT_SIZE, TEXT_SIZE*2, TEXT_SIZE/2, TEXT_COLOR);
+			return;
+		}
+
+		if(paddle_0_lives == 0) {
+			DrawText("Player 1 WIN! Press SPACE to restart...", (int)MARGIN+TEXT_SIZE, WINDOW_HEIGHT - TEXT_SIZE, TEXT_SIZE, TEXT_COLOR);
+		} else {
+			DrawText("Player 0 WIN! Press SPACE to restart...", (int)MARGIN+TEXT_SIZE, WINDOW_HEIGHT - TEXT_SIZE, TEXT_SIZE, TEXT_COLOR);
+		}
 	}
 };
 
@@ -480,11 +489,7 @@ void GameOverScreen::update(float dt){
 }
 
 void GameOverScreen::render() const{
-	if(game.get_paddle_0().get_lives() == 0) {
-		DrawText("Player 1 WIN! Press SPACE to restart...", (int)MARGIN+TEXT_SIZE, WINDOW_HEIGHT - TEXT_SIZE, TEXT_SIZE, TEXT_COLOR);
-	} else {
-		DrawText("Player 0 WIN! Press SPACE to restart...", (int)MARGIN+TEXT_SIZE, WINDOW_HEIGHT - TEXT_SIZE, TEXT_SIZE, TEXT_COLOR);
-	}
+	game.get_scoreboard().render();
 }
 
 int main(){
