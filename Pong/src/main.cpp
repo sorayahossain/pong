@@ -486,29 +486,34 @@ void PlayingScreen::update(float dt){
 
 	bool scored = false;
 	uint bounces = 0;
-	for(Ball& ball : balls){
-		ball.update(dt);
-		if(ball.do_collision_with(paddle_0.get_rectangle())){
-			bounces++;
-		}
-		if(ball.do_collision_with(paddle_1.get_rectangle())){
-			bounces++;
-		}
-
-		Side side;
-		if(game.check_bounds_for(ball, side)) {
-			switch (side) {
-				case Side::LEFT:
-					game.get_scoreboard().score_up(Side::RIGHT);
-					scored = true;
-					break;
-				case Side::RIGHT:
-					game.get_scoreboard().score_up(Side::LEFT);
-					scored = true;
-					break;
+	std::erase_if(
+		balls,
+		[&](Ball& ball){
+			ball.update(dt);
+			if(ball.do_collision_with(paddle_0.get_rectangle())){
+				bounces++;
 			}
+			if(ball.do_collision_with(paddle_1.get_rectangle())){
+				bounces++;
+			}
+
+			Side side;
+			if(game.check_bounds_for(ball, side)) {
+				switch (side) {
+					case Side::LEFT:
+						game.get_scoreboard().score_up(Side::RIGHT);
+						scored = true;
+						return true;
+					case Side::RIGHT:
+						game.get_scoreboard().score_up(Side::LEFT);
+						scored = true;
+						return true;
+				}
+			}
+
+			return false;
 		}
-	}
+	);
 
 	for(uint i = 0; i < bounces; i++){
 		game.paddle_bounced();
@@ -531,8 +536,11 @@ void PlayingScreen::render() const{
 }
 
 void RoundOverScreen::update(float dt){
-	game.reset_balls();
-	game.serve_all_balls();
+	std::vector<Ball>& balls = game.get_balls();
+	if(balls.size() == 0){
+		balls.emplace_back();
+		balls.back().launch();
+	}
 	game.set_state(GameState::PLAYING);
 }
 
