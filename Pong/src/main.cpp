@@ -400,6 +400,7 @@ void StartScreen::update(float dt){
 		game.get_paddle_1().reset();
 		game.get_ball().reset();
 		game.get_ball().launch();
+		game.get_scoreboard().reset();
 		game.set_state(GameState::PLAYING);
 	}
 }
@@ -485,6 +486,7 @@ void GameOverScreen::update(float dt){
 		game.get_paddle_1().reset();
 		game.get_ball().reset();
 		game.get_ball().launch();
+		game.get_scoreboard().reset();
 		game.set_state(GameState::PLAYING);
 	}
 }
