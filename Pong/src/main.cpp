@@ -226,6 +226,7 @@ public:
 	}
 
 	bool is_game_over(){
+		return paddle_0_lives == 0 || paddle_1_lives == 0;
 	}
 
 	void render() const{
