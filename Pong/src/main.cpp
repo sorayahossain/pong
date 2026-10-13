@@ -306,8 +306,7 @@ public:
 };
 
 class Game{
-	Paddle paddle_0{Side::LEFT};
-	Paddle paddle_1{Side::RIGHT};
+	std::vector<Paddle> paddles;
 	std::vector<Ball> balls;
 	GameState state = GameState::START_SCREEN;
 	std::unique_ptr<Screen> screen;
@@ -402,12 +401,8 @@ public:
 		return scoreboard;
 	}
 
-	Paddle& get_paddle_0() {
-		return paddle_0;
-	}
-
-	Paddle& get_paddle_1() {
-		return paddle_1;
+	std::vector<Paddle>& get_paddles() {
+		return paddles;
 	}
 
 	std::vector<Ball>& get_balls() {
