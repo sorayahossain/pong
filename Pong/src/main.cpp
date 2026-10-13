@@ -127,13 +127,18 @@ class Paddle;
 using Controller = std::function<int(const Paddle&, const std::vector<Ball>)>;
 
 class Paddle{
-	Rectangle rectangle{0.0f, 0.0f, PADDLE_WIDTH, PADDLE_HEIGHT};
+	Rectangle rectangle;
 	Color color{RAYWHITE};
 	Side side{Side::LEFT};
 	Controller controller;
 
 public:
 	Paddle(Side position): side{position}{
+		if(side == Side::LEFT || side == Side::RIGHT){
+			rectangle = {0.0f, 0.0f, PADDLE_WIDTH, PADDLE_HEIGHT};
+		} else {
+			rectangle = {0.0f, 0.0f, PADDLE_HEIGHT, PADDLE_WIDTH};
+		}
 		reset();
 	}
 
@@ -150,6 +155,18 @@ public:
 			const auto MIN_Y = 0.0f;
 			const auto MAX_Y = WINDOW_HEIGHT - rectangle.height;
 			rectangle.y = std::clamp(rectangle.y, MIN_Y, MAX_Y);
+		} else {
+			switch(controller(*this, balls)){
+				case -1:
+					rectangle.x += PADDLE_SPEED * dt;
+					break;
+				case 1:
+					rectangle.x -= PADDLE_SPEED * dt;
+					break;
+			}
+			const auto MIN_X = 0.0f;
+			const auto MAX_X = WINDOW_WIDTH - rectangle.width;
+			rectangle.x = std::clamp(rectangle.x, MIN_X, MAX_X);
 		}
 	}
 
@@ -162,11 +179,19 @@ public:
 	}
 
 	void reset(){
-		if(side == Side::LEFT){
-			reset_position(MARGIN, (WINDOW_HEIGHT - PADDLE_HEIGHT) / 2.0f);
-		}
-		if(side == Side::RIGHT){
-			reset_position(WINDOW_WIDTH - PADDLE_WIDTH - MARGIN, (WINDOW_HEIGHT - PADDLE_HEIGHT) / 2.0f);
+		switch(side){
+			case Side::LEFT:
+				reset_position(MARGIN, (WINDOW_HEIGHT - PADDLE_HEIGHT) / 2.0f);
+				break;
+			case Side::RIGHT:
+				reset_position(WINDOW_WIDTH - PADDLE_WIDTH - MARGIN, (WINDOW_HEIGHT - PADDLE_HEIGHT) / 2.0f);
+				break;
+			case Side::TOP:
+				reset_position((WINDOW_WIDTH - PADDLE_HEIGHT) / 2.0f, MARGIN);
+				break;
+			case Side::BOTTOM:
+				reset_position((WINDOW_WIDTH - PADDLE_HEIGHT) / 2.0f, WINDOW_HEIGHT - MARGIN - PADDLE_WIDTH);
+				break;
 		}
 	}
 
