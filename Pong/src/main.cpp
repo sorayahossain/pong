@@ -199,6 +199,10 @@ public:
 		return rectangle;
 	}
 
+	Side get_side() const{
+		return side;
+	}
+
 	void reset_position(float x, float y){
 		rectangle.y = y;
 		rectangle.x = x;
@@ -440,19 +444,35 @@ public:
 
 void StartScreen::update(float dt){
 	if(IsKeyPressed(KEY_SPACE)){
-		game.get_paddle_0().reset();
-		game.get_paddle_1().reset();
 		game.reset_balls();
 		game.serve_all_balls();
+
 		game.get_scoreboard().reset();
 
-		Controller human_controller = [](const Paddle& paddle, const std::vector<Ball> balls){
-			if(IsKeyDown(KEY_UP) && !IsKeyDown(KEY_DOWN)){
-				return 1;
-			}
+		std::vector<Paddle>& paddles = game.get_paddles();
+		paddles.clear();
+		paddles.emplace_back(Side::LEFT);
+		paddles.emplace_back(Side::RIGHT);
+		paddles.emplace_back(Side::TOP);
+		paddles.emplace_back(Side::BOTTOM);
 
-			if(!IsKeyPressed(KEY_UP) && IsKeyDown(KEY_DOWN)){
-				return -1;
+		Controller human_controller = [](const Paddle& paddle, const std::vector<Ball> balls){
+			if(paddle.get_side() == Side::LEFT || paddle.get_side() == Side::RIGHT){
+				if(IsKeyDown(KEY_UP) && !IsKeyDown(KEY_DOWN)){
+					return 1;
+				}
+
+				if(!IsKeyPressed(KEY_UP) && IsKeyDown(KEY_DOWN)){
+					return -1;
+				}
+			} else {
+				if(IsKeyDown(KEY_LEFT) && !IsKeyDown(KEY_RIGHT)){
+					return 1;
+				}
+
+				if(!IsKeyPressed(KEY_LEFT) && IsKeyDown(KEY_RIGHT)){
+					return -1;
+				}
 			}
 
 			return 0;
@@ -483,15 +503,24 @@ void StartScreen::update(float dt){
 			return 0;
 		};
 
-		game.get_paddle_0().set_controller(human_controller);
-		game.get_paddle_1().set_controller(ai_controller);
+		uint i = 0;
+		for(Paddle& paddle : game.get_paddles()){
+			if(i % 2 == 0){
+				paddle.set_controller(human_controller);
+			} else {
+				paddle.set_controller(ai_controller);
+			}
+			i++;
+		}
+
 		game.set_state(GameState::PLAYING);
 	}
 }
 
 void StartScreen::render() const{
-	game.get_paddle_0().render();
-	game.get_paddle_1().render();
+	for(Paddle& paddle : game.get_paddles()){
+		paddle.render();
+	}
 	game.render_balls();
 	DrawText("Press SPACE to serve!", (int)MARGIN+TEXT_SIZE, WINDOW_HEIGHT - TEXT_SIZE, TEXT_SIZE, TEXT_COLOR);
 }
