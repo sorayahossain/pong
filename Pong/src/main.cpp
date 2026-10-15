@@ -480,37 +480,48 @@ void StartScreen::update(float dt){
 
 		Controller ai_controller = [](const Paddle& paddle, const std::vector<Ball> balls){
 			Rectangle rectangle = paddle.get_rectangle();
+			bool vertical = paddle.get_side() == Side::LEFT || paddle.get_side() == Side::RIGHT;
 
 			const Ball* nearest_ball = &balls.front();
-			float distance = std::abs(rectangle.x - nearest_ball->position.x);
+			float distance = vertical
+				? std::abs(rectangle.x - nearest_ball->position.x)
+				: std::abs(rectangle.y - nearest_ball->position.y);
 			for (const Ball& ball : balls){
-				float new_distance = std::abs(rectangle.x - ball.position.x);
+				float new_distance = vertical
+					? std::abs(rectangle.x - ball.position.x)
+					: std::abs(rectangle.y - ball.position.y);
 				if(new_distance < distance){
 					distance = new_distance;
 					nearest_ball = &ball;
 				}
 			}
 
-			float y = rectangle.y + PADDLE_HEIGHT/2;
-			if(y > nearest_ball->position.y){
-				return 1;
-			}
+			if(vertical){
+				float y = rectangle.y + PADDLE_HEIGHT/2;
+				if(y > nearest_ball->position.y){
+					return 1;
+				}
 
-			if(y < nearest_ball->position.y){
-				return -1;
+				if(y < nearest_ball->position.y){
+					return -1;
+				}
+			} else {
+				float x = rectangle.x + PADDLE_HEIGHT/2;
+				if(x > nearest_ball->position.x){
+					return 1;
+				}
+
+				if(x < nearest_ball->position.x){
+					return -1;
+				}
 			}
 
 			return 0;
 		};
 
-		uint i = 0;
-		for(Paddle& paddle : game.get_paddles()){
-			if(i % 2 == 0){
-				paddle.set_controller(human_controller);
-			} else {
-				paddle.set_controller(ai_controller);
-			}
-			i++;
+		paddles.front().set_controller(human_controller);
+		for(uint i = 1; i < paddles.size(); i++){
+			paddles[i].set_controller(ai_controller);
 		}
 
 		game.set_state(GameState::PLAYING);
