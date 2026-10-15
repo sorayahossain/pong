@@ -217,49 +217,58 @@ enum class GameState {
 };
 
 class Scoreboard {
-	uint paddle_0_lives;
-	uint paddle_1_lives;
-	uint paddle_0_score;
-	uint paddle_1_score;
+	std::vector<uint> lives;
+	std::vector<uint> scores;
 
 public:
-	Scoreboard(){
-		reset();
+	void reset(uint player_count){
+		lives.assign(player_count, 5);
+		scores.assign(player_count, 0);
 	}
 
-	void reset(){
-		paddle_0_lives = 5;
-		paddle_1_lives = 5;
-		paddle_0_score = 0;
-		paddle_1_score = 0;
-	}
+	void score_up(uint loser){
+		if(lives[loser] == 0){
+			return;
+		}
 
-	void score_up(Side side){
-		if(side == Side::LEFT){
-			paddle_0_score++;
-			paddle_1_lives--;
-		} else {
-			paddle_1_score++;
-			paddle_0_lives--;
+		lives[loser]--;
+		for(uint i = 0; i < scores.size(); i++){
+			if(i != loser && lives[i] > 0){
+				scores[i]++;
+			}
 		}
 	}
 
+	bool is_dead(uint index) const{
+		return lives[index] == 0;
+	}
+
+	uint alive_count() const{
+		return (uint)std::count_if(lives.begin(), lives.end(), [](uint l){ return l > 0; });
+	}
+
 	bool is_game_over() const{
-		return paddle_0_lives == 0 || paddle_1_lives == 0;
+		return alive_count() <= 1;
 	}
 
 	void render() const{
 		if(!is_game_over()){
-			DrawText(("Player 0: (lives: " + std::to_string(paddle_0_lives) + "; Score: " + std::to_string(paddle_0_score) + ")").c_str(), (int)MARGIN+TEXT_SIZE, TEXT_SIZE, TEXT_SIZE/2, TEXT_COLOR);
-			DrawText(("Player 1: (lives: " + std::to_string(paddle_1_lives) + "; Score: " + std::to_string(paddle_1_score) + ")").c_str(), (int)MARGIN+TEXT_SIZE, TEXT_SIZE*2, TEXT_SIZE/2, TEXT_COLOR);
+			for(uint i = 0; i < lives.size(); i++){
+				std::string text = "Player " + std::to_string(i) + ": (lives: " + std::to_string(lives[i]) + "; Score: " + std::to_string(scores[i]) + ")";
+				DrawText(text.c_str(), (int)MARGIN+TEXT_SIZE, TEXT_SIZE*(i+1), TEXT_SIZE/2, TEXT_COLOR);
+			}
 			return;
 		}
 
-		if(paddle_0_lives == 0) {
-			DrawText("Player 1 WIN! Press SPACE to restart...", (int)MARGIN+TEXT_SIZE, WINDOW_HEIGHT - TEXT_SIZE, TEXT_SIZE, TEXT_COLOR);
-		} else {
-			DrawText("Player 0 WIN! Press SPACE to restart...", (int)MARGIN+TEXT_SIZE, WINDOW_HEIGHT - TEXT_SIZE, TEXT_SIZE, TEXT_COLOR);
+		for(uint i = 0; i < lives.size(); i++){
+			if(lives[i] > 0){
+				std::string text = "Player " + std::to_string(i) + " WIN! Press SPACE to restart...";
+				DrawText(text.c_str(), (int)MARGIN+TEXT_SIZE, WINDOW_HEIGHT - TEXT_SIZE, TEXT_SIZE, TEXT_COLOR);
+				return;
+			}
 		}
+
+		DrawText("Everyone's out! Press SPACE to restart...", (int)MARGIN+TEXT_SIZE, WINDOW_HEIGHT - TEXT_SIZE, TEXT_SIZE, TEXT_COLOR);
 	}
 };
 
@@ -447,14 +456,14 @@ void StartScreen::update(float dt){
 		game.reset_balls();
 		game.serve_all_balls();
 
-		game.get_scoreboard().reset();
-
 		std::vector<Paddle>& paddles = game.get_paddles();
 		paddles.clear();
 		paddles.emplace_back(Side::LEFT);
 		paddles.emplace_back(Side::RIGHT);
 		paddles.emplace_back(Side::TOP);
 		paddles.emplace_back(Side::BOTTOM);
+
+		game.get_scoreboard().reset(paddles.size());
 
 		Controller human_controller = [](const Paddle& paddle, const std::vector<Ball> balls){
 			if(paddle.get_side() == Side::LEFT || paddle.get_side() == Side::RIGHT){
@@ -558,16 +567,9 @@ void PlayingScreen::update(float dt){
 
 			Side side;
 			if(game.check_bounds_for(ball, side)) {
-				switch (side) {
-					case Side::LEFT:
-						game.get_scoreboard().score_up(Side::RIGHT);
-						scored = true;
-						return true;
-					case Side::RIGHT:
-						game.get_scoreboard().score_up(Side::LEFT);
-						scored = true;
-						return true;
-				}
+				game.get_scoreboard().score_up(static_cast<uint>(side));
+				scored = true;
+				return true;
 			}
 
 			return false;
@@ -619,7 +621,7 @@ void GameOverScreen::update(float dt){
 		}
 		game.reset_balls();
 		game.serve_all_balls();
-		game.get_scoreboard().reset();
+		game.get_scoreboard().reset(game.get_paddles().size());
 		game.set_state(GameState::PLAYING);
 	}
 }
