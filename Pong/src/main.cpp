@@ -526,12 +526,12 @@ void StartScreen::render() const{
 }
 
 void PlayingScreen::update(float dt){
-	Paddle& paddle_0 = game.get_paddle_0();
-	Paddle& paddle_1 = game.get_paddle_1();
-    std::vector<Ball>& balls = game.get_balls();
+	std::vector<Paddle>& paddles = game.get_paddles();
+	std::vector<Ball>& balls = game.get_balls();
 
-	paddle_0.update(balls, dt);
-	paddle_1.update(balls, dt);
+	for(Paddle& paddle : paddles){
+		paddle.update(balls, dt);
+	}
 
 	bool scored = false;
 	uint bounces = 0;
@@ -539,11 +539,10 @@ void PlayingScreen::update(float dt){
 		balls,
 		[&](Ball& ball){
 			ball.update(dt);
-			if(ball.do_collision_with(paddle_0.get_rectangle())){
-				bounces++;
-			}
-			if(ball.do_collision_with(paddle_1.get_rectangle())){
-				bounces++;
+			for(Paddle& paddle : paddles){
+				if(ball.do_collision_with(paddle.get_rectangle())){
+					bounces++;
+				}
 			}
 
 			Side side;
@@ -578,8 +577,9 @@ void PlayingScreen::update(float dt){
 }
 
 void PlayingScreen::render() const{
-	game.get_paddle_0().render();
-	game.get_paddle_1().render();
+	for(Paddle& paddle : game.get_paddles()){
+		paddle.render();
+	}
 	game.render_balls();
 	game.get_scoreboard().render();
 }
@@ -594,16 +594,18 @@ void RoundOverScreen::update(float dt){
 }
 
 void RoundOverScreen::render() const{
-	game.get_paddle_0().render();
-	game.get_paddle_1().render();
+	for(Paddle& paddle : game.get_paddles()){
+		paddle.render();
+	}
 	game.render_balls();
 	game.get_scoreboard().render();
 }
 
 void GameOverScreen::update(float dt){
 	if(IsKeyPressed(KEY_SPACE)){
-		game.get_paddle_0().reset();
-		game.get_paddle_1().reset();
+		for(Paddle& paddle : game.get_paddles()){
+			paddle.reset();
+		}
 		game.reset_balls();
 		game.serve_all_balls();
 		game.get_scoreboard().reset();
