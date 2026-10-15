@@ -267,6 +267,9 @@ class Game{
 	}
 
 	void render() const{
+		BeginDrawing();
+		ClearBackground(BACKGROUND_COLOR);
+
 		switch (state) {
 			case GameState::START_SCREEN:
 				break;
@@ -278,8 +281,6 @@ class Game{
 				break;
 		}
 
-		BeginDrawing();
-		ClearBackground(BACKGROUND_COLOR);
 		paddle_0.render();
 		paddle_1.render();
 		ball.render();
@@ -295,6 +296,7 @@ class Game{
 			DrawText(("Player 0: (Lives: " + std::to_string(paddle_0.get_lives()) + "; Score: " + std::to_string(paddle_0.get_score()) + ")").c_str(), (int)MARGIN+TEXT_SIZE, TEXT_SIZE, TEXT_SIZE/2, TEXT_COLOR);
 			DrawText(("Player 1: (Lives: " + std::to_string(paddle_1.get_lives()) + "; Score: " + std::to_string(paddle_1.get_score()) + ")").c_str(), (int)MARGIN+TEXT_SIZE, TEXT_SIZE*2, TEXT_SIZE/2, TEXT_COLOR);
 		}
+
 		EndDrawing();
 	}
 
