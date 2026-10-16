@@ -75,6 +75,12 @@ struct Ball{
 
 	void launch(){
 		velocity = LAUNCH_VELOCITY;
+		if(GetRandomValue(0, 1) == 1){
+			velocity.x *= -1.0f;
+		}
+		if(GetRandomValue(0, 1) == 1){
+			velocity.y *= -1.0f;
+		}
 	}
 
 	void speed_up(Axis axis, float delta){
