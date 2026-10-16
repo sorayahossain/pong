@@ -556,9 +556,12 @@ void StartScreen::render() const{
 void PlayingScreen::update(float dt){
 	std::vector<Paddle>& paddles = game.get_paddles();
 	std::vector<Ball>& balls = game.get_balls();
+	Scoreboard& scoreboard = game.get_scoreboard();
 
-	for(Paddle& paddle : paddles){
-		paddle.update(balls, dt);
+	for(uint i = 0; i < paddles.size(); i++){
+		if(!scoreboard.is_dead(i)){
+			paddles[i].update(balls, dt);
+		}
 	}
 
 	bool scored = false;
@@ -567,15 +570,20 @@ void PlayingScreen::update(float dt){
 		balls,
 		[&](Ball& ball){
 			ball.update(dt);
-			for(Paddle& paddle : paddles){
-				if(ball.do_collision_with(paddle.get_rectangle())){
+			for(uint i = 0; i < paddles.size(); i++){
+				if(!scoreboard.is_dead(i) && ball.do_collision_with(paddles[i].get_rectangle())){
 					bounces++;
 				}
 			}
 
 			Side side;
 			if(game.check_bounds_for(ball, side)) {
-				game.get_scoreboard().score_up(static_cast<uint>(side));
+				uint index = static_cast<uint>(side);
+				if(scoreboard.is_dead(index)){
+					return false;
+				}
+
+				scoreboard.score_up(index);
 				scored = true;
 				return true;
 			}
