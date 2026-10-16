@@ -449,6 +449,14 @@ public:
 			ball.render();
 		}
 	}
+
+	void render_paddles() const{
+		for(uint i = 0; i < paddles.size(); i++){
+			if(!scoreboard.is_dead(i)){
+				paddles[i].render();
+			}
+		}
+	}
 };
 
 void StartScreen::update(float dt){
@@ -590,9 +598,7 @@ void PlayingScreen::update(float dt){
 }
 
 void PlayingScreen::render() const{
-	for(Paddle& paddle : game.get_paddles()){
-		paddle.render();
-	}
+	game.render_paddles();
 	game.render_balls();
 	game.get_scoreboard().render();
 }
@@ -607,9 +613,7 @@ void RoundOverScreen::update(float dt){
 }
 
 void RoundOverScreen::render() const{
-	for(Paddle& paddle : game.get_paddles()){
-		paddle.render();
-	}
+	game.render_paddles();
 	game.render_balls();
 	game.get_scoreboard().render();
 }
